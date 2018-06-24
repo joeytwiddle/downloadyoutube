@@ -5,7 +5,7 @@
 // @author Gantt
 // @contributor nanojin
 // @contributor joeytwiddle
-// @version 1.8.8.1-joey
+// @version 1.8.8.2-joey
 // @date 2016-09-02
 // @namespace http://googlesystem.blogspot.com
 // @include http://www.youtube.com/*
@@ -110,6 +110,12 @@
     'webm':'all',
     'm4a':'all'
   };
+
+  //var FORMAT_LABEL={'5':'FLV 240p','18':'MP4 360p','22':'MP4 720p','34':'FLV 360p','35':'FLV 480p','37':'MP4 1080p','38':'MP4 2160p','43':'WebM 360p','44':'WebM 480p','45':'WebM 720p','46':'WebM 1080p','135':'MP4 480p - no audio','137':'MP4 1080p - no audio','138':'MP4 2160p - no audio','139':'M4A 48kbps - audio','140':'M4A 128kbps - audio','141':'M4A 256kbps - audio','264':'MP4 1440p - no audio','266':'MP4 2160p - no audio','298':'MP4 720p60 - no audio','299':'MP4 1080p60 - no audio'};
+  //var FORMAT_TYPE={'5':'flv','18':'mp4','22':'mp4','34':'flv','35':'flv','37':'mp4','38':'mp4','43':'webm','44':'webm','45':'webm','46':'webm','135':'mp4','137':'mp4','138':'mp4','139':'m4a','140':'m4a','141':'m4a','264':'mp4','266':'mp4','298':'mp4','299':'mp4'};
+  //var FORMAT_ORDER=['5','18','34','43','35','135','44','22','298','45','37','299','46','264','38','266','139','140','141'];
+  //var FORMAT_RULE={'flv':'max','mp4':'all','webm':'none','m4a':'max'};
+
   // all=display all versions, max=only highest quality version, none=no version
   // the default settings show all MP4 videos
   var SHOW_DASH_FORMATS=false;
@@ -125,6 +131,20 @@
   var STORAGE_CODE='download-youtube-signature-code';
   var STORAGE_DASH='download-youtube-dash-enabled';
   var isDecodeRuleUpdated=false;
+
+  // Joey added low-quality formats for users with low bandwidth
+  FORMAT_LABEL['17'] = '3GP 176p';
+  FORMAT_LABEL['36'] = '3GP 320p';
+  FORMAT_TYPE['17'] = '3gp';
+  FORMAT_TYPE['36'] = '3gp';
+  FORMAT_ORDER.unshift('36');
+  FORMAT_ORDER.unshift('17');
+  //FORMAT_RULE['3gp'] = 'min';
+  FORMAT_RULE['3gp'] = 'all';
+  //FORMAT_RULE['webm'] = 'all';
+  FORMAT_RULE['flv'] = 'none';
+  //FORMAT_RULE['mp4'] = 'max';
+  SHOW_DASH_FORMATS = true;
 
   start();
 
