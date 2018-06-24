@@ -60,7 +60,7 @@
     '140':'M4A 128kbps - audio',
   };
   var FORMAT_TYPE={
-    // WebM 
+    // WebM
     '43':'webm',
     '244':'webm',
     '247':'webm',
@@ -110,7 +110,7 @@
     'webm':'all',
     'm4a':'all'
   };
-  // all=display all versions, max=only highest quality version, none=no version  
+  // all=display all versions, max=only highest quality version, none=no version
   // the default settings show all MP4 videos
   var SHOW_DASH_FORMATS=false;
   var BUTTON_TEXT={'ar':'تنزيل','cs':'Stáhnout','de':'Herunterladen','en':'Download','es':'Descargar','fr':'Télécharger','hi':'डाउनलोड','hu':'Letöltés','id':'Unduh','it':'Scarica','ja':'ダウンロード','ko':'내려받기','pl':'Pobierz','pt':'Baixar','ro':'Descărcați','ru':'Скачать','tr':'İndir','zh':'下载','zh-TW':'下載'};
@@ -124,16 +124,16 @@
   var STORAGE_URL='download-youtube-script-url';
   var STORAGE_CODE='download-youtube-signature-code';
   var STORAGE_DASH='download-youtube-dash-enabled';
-  var isDecodeRuleUpdated=false;  
-    
+  var isDecodeRuleUpdated=false;
+
   start();
-          
+
 function start() {
   var pagecontainer=document.body;
   if (!pagecontainer) return;
-  if (/^https?:\/\/www\.youtube.com\/watch\?/.test(window.location.href)) run();       
+  if (/^https?:\/\/www\.youtube.com\/watch\?/.test(window.location.href)) run();
   var isAjax=/class[\w\s"'-=]+spf\-link/.test(pagecontainer.innerHTML);
-  var logocontainer=document.getElementById('logo-container');  
+  var logocontainer=document.getElementById('logo-container');
   if (logocontainer && !isAjax) { // fix for blocked videos
     isAjax=(' '+logocontainer.className+' ').indexOf(' spf-link ')>=0;
   }
@@ -158,15 +158,15 @@ function start() {
       } else { // MutationObserver fallback for old browsers
         pagecontainer.addEventListener('DOMNodeInserted', onNodeInserted, false);
       }
-  } 
+  }
 }
 
-function onNodeInserted(e) { 
+function onNodeInserted(e) {
     if (e && e.target && e.target.id=='top') { // old value: movie_player
       run();
   }
 }
-  
+
 function run() {
   if (document.getElementById(CONTAINER_ID)) return; // check download container
   if (document.getElementById('p') && document.getElementById('vo')) return; // Feather not supported
@@ -185,9 +185,9 @@ function run() {
   if (document.getElementById('watch7-action-buttons')) {  // old UI
     fixTranslations(language, textDirection);
   }
-        
-  // obtain video ID, formats map   
-  
+
+  // obtain video ID, formats map
+
   var args=null;
   var usw=(typeof this.unsafeWindow !== 'undefined')?this.unsafeWindow:this.window; // Firefox, Opera<15
   if (usw.ytplayer && usw.ytplayer.config && usw.ytplayer.config.args) {
@@ -204,7 +204,7 @@ function run() {
   }
   if (usw.ytplayer && usw.ytplayer.config && usw.ytplayer.config.assets) {
     scriptURL=usw.ytplayer.config.assets.js;
-  }  
+  }
 
   if (videoID==null) { // unsafeWindow workaround (Chrome, Opera 15+)
     var buffer=document.getElementById(DEBUG_ID+'2');
@@ -214,7 +214,7 @@ function run() {
       }
     } else {
       buffer=createHiddenElem('pre', DEBUG_ID+'2');
-    }    
+    }
     injectScript ('if(ytplayer&&ytplayer.config&&ytplayer.config.args){document.getElementById("'+DEBUG_ID+'2").appendChild(document.createTextNode(\'"video_id":"\'+ytplayer.config.args.video_id+\'", "js":"\'+ytplayer.config.assets.js+\'", "dashmpd":"\'+ytplayer.config.args.dashmpd+\'", "url_encoded_fmt_stream_map":"\'+ytplayer.config.args.url_encoded_fmt_stream_map+\'", "adaptive_fmts":"\'+ytplayer.config.args.adaptive_fmts+\'"\'));}');
     var code=buffer.innerHTML;
     if (code) {
@@ -228,9 +228,9 @@ function run() {
     }
     debug('DYVAM - Info: Injection mode. videoID '+(videoID?videoID:'none')+'; ');
   }
-     
+
   if (videoID==null) { // if all else fails
-    var bodyContent=document.body.innerHTML;  
+    var bodyContent=document.body.innerHTML;
     if (bodyContent!=null) {
       videoID=findMatch(bodyContent, /\"video_id\":\s*\"([^\"]+)\"/);
       videoFormats=findMatch(bodyContent, /\"url_encoded_fmt_stream_map\":\s*\"([^\"]+)\"/);
@@ -241,18 +241,18 @@ function run() {
         if (scriptURL) {
           scriptURL=scriptURL.replace(/\\/g,'');
         }
-      }      
+      }
     }
     debug('DYVAM - Info: Brute mode. videoID '+(videoID?videoID:'none')+'; ');
   }
-  
-  debug('DYVAM - Info: url '+window.location.href+'; useragent '+window.navigator.userAgent);  
-  
+
+  debug('DYVAM - Info: url '+window.location.href+'; useragent '+window.navigator.userAgent);
+
   if (videoID==null || videoFormats==null || videoID.length==0 || videoFormats.length==0) {
    debug('DYVAM - Error: No config information found. YouTube must have changed the code.');
    return;
   }
-  
+
   // Opera 12 extension message handler
   if (typeof window.opera !== 'undefined' && window.opera && typeof opera.extension !== 'undefined') {
     opera.extension.onmessage = function(event) {
@@ -262,13 +262,13 @@ function run() {
         var trigger=(operaTable[index])['onload'];
         if (typeof trigger === 'function' && event.data.readyState == 4) {
           if (trigger) {
-              trigger(event.data);         
+              trigger(event.data);
           }
         }
       }
     }
   }
-    
+
   if (!isDecodeRuleUpdated) {
     DECODE_RULE=getDecodeRules(DECODE_RULE);
     isDecodeRuleUpdated=true;
@@ -280,7 +280,7 @@ function run() {
     }
     fetchSignatureScript(scriptURL);
   }
-  
+
    // video title
    var videoTitle=document.title || 'video';
    videoTitle=videoTitle.replace(/\s*\-\s*YouTube$/i, '').replace(/'/g, '\'').replace(/^\s+|\s+$/g, '').replace(/\.+$/g, '');
@@ -290,12 +290,12 @@ function run() {
    } else {
       videoTitle=videoTitle.replace(/#/g, '%23').replace(/&/g, '%26'); //  Mac, Linux
    }
-                        
+
   // parse the formats map
   var sep1='%2C', sep2='%26', sep3='%3D';
-  if (videoFormats.indexOf(',')>-1) { 
-    sep1=','; 
-    sep2=(videoFormats.indexOf('&')>-1)?'&':'\\u0026'; 
+  if (videoFormats.indexOf(',')>-1) {
+    sep1=',';
+    sep2=(videoFormats.indexOf('&')>-1)?'&':'\\u0026';
     sep3='=';
   }
   var videoURL=new Array();
@@ -332,7 +332,7 @@ function run() {
       videoURL[itag]=url+'&title='+videoTitle;
     }
   }
-    
+
   var showFormat=new Array();
   for (var category in FORMAT_RULE) {
     var rule=FORMAT_RULE[category];
@@ -351,14 +351,14 @@ function run() {
       }
     }
   }
-  
+
   var dashPref=getPref(STORAGE_DASH);
   if (dashPref=='1') {
     SHOW_DASH_FORMATS=true;
   } else if (dashPref!='0') {
     setPref(STORAGE_DASH,'0');
   }
-  
+
   var downloadCodeList=[];
   for (var i=0;i<FORMAT_ORDER.length;i++) {
     var format=FORMAT_ORDER[i];
@@ -372,19 +372,19 @@ function run() {
        format='138';
       }
       showFormat[format]=showFormat['38'];
-    }    
+    }
     if (!SHOW_DASH_FORMATS && format.length>2) continue;
     if (videoURL[format]!=undefined && FORMAT_LABEL[format]!=undefined && showFormat[format]) {
       downloadCodeList.push({url:videoURL[format],sig:videoSignature[format],format:format,label:FORMAT_LABEL[format]});
       debug('DYVAM - Info: itag'+format+' url:'+videoURL[format]);
     }
-  }  
-  
+  }
+
   if (downloadCodeList.length==0) {
     debug('DYVAM - Error: No download URL found. Probably YouTube uses encrypted streams.');
     return; // no format
-  } 
-    
+  }
+
   // find parent container
   var newWatchPage=false;
   var parentElement=document.getElementById('watch7-action-buttons');
@@ -397,11 +397,11 @@ function run() {
       newWatchPage=true;
     }
   }
-  
+
   // get button labels
   var buttonText=(BUTTON_TEXT[language])?BUTTON_TEXT[language]:BUTTON_TEXT['en'];
   var buttonLabel=(BUTTON_TOOLTIP[language])?BUTTON_TOOLTIP[language]:BUTTON_TOOLTIP['en'];
-    
+
   // generate download code for regular interface
   var mainSpan=document.createElement('span');
 
@@ -420,7 +420,7 @@ function run() {
   spanButton.setAttribute('class', 'yt-uix-button-content');
   spanButton.appendChild(document.createTextNode(buttonText+' '));
   mainSpan.appendChild(spanButton);
-  
+
   if (!newWatchPage) { // old UI
     var imgButton=document.createElement('img');
     imgButton.setAttribute('class', 'yt-uix-button-arrow');
@@ -458,7 +458,7 @@ function run() {
     buttonElement.setAttribute('class', 'yt-uix-button yt-uix-tooltip yt-uix-button-empty yt-uix-button-text');
     buttonElement.setAttribute('style', 'margin-top:4px; margin-left:'+((textDirection=='left')?5:10)+'px;');
   }
-  buttonElement.setAttribute('data-tooltip-text', buttonLabel);  
+  buttonElement.setAttribute('data-tooltip-text', buttonLabel);
   buttonElement.setAttribute('type', 'button');
   buttonElement.setAttribute('role', 'button');
   buttonElement.addEventListener('click', function(){return false;}, false);
@@ -467,20 +467,20 @@ function run() {
   containerSpan.setAttribute('id', CONTAINER_ID);
   containerSpan.appendChild(document.createTextNode(' '));
   containerSpan.appendChild(buttonElement);
-                                            
+
   // add the button
   if (!newWatchPage) { // watch7
     parentElement.appendChild(containerSpan);
   } else { // watch8
     parentElement.insertBefore(containerSpan, parentElement.firstChild);
   }
-    
+
   // REPLACEWITH if (!isSignatureUpdatingStarted) {
-    for (var i=0;i<downloadCodeList.length;i++) { 
+    for (var i=0;i<downloadCodeList.length;i++) {
       addFileSize(downloadCodeList[i].url, downloadCodeList[i].format);
     }
-  // } 
-  
+  // }
+
   if (typeof GM_download !== 'undefined') {
     for (var i=0;i<downloadCodeList.length;i++) {
       var downloadFMT=document.getElementById(LISTITEM_ID+downloadCodeList[i].format);
@@ -491,12 +491,12 @@ function run() {
       }
     }
   }
-  
+
   addFromManifest();
-  
+
   function downloadVideoNatively(e) {
     var elem=e.currentTarget;
-    e.returnValue=false;    
+    e.returnValue=false;
     if (e.preventDefault) {
       e.preventDefault();
     }
@@ -506,7 +506,7 @@ function run() {
     }
     return false;
   }
-  
+
   function addFromManifest() { // add Dash URLs from manifest file
     var formats=['137', '138', '140']; // 137=1080p, 138=4k, 140=m4a
     var isNecessary=true;
@@ -559,26 +559,26 @@ function run() {
                 lastFormatFromList=k;
               }
             }
-          } 
+          }
         });
-    }  
+    }
   }
-  
+
   function injectStyle(code) {
     var style=document.createElement('style');
     style.type='text/css';
     style.appendChild(document.createTextNode(code));
     document.getElementsByTagName('head')[0].appendChild(style);
   }
-  
+
   function injectScript(code) {
     var script=document.createElement('script');
     script.type='application/javascript';
     script.textContent=code;
     document.body.appendChild(script);
     document.body.removeChild(script);
-  }    
-  
+  }
+
   function debug(str) {
     //console.log("[debug]", str);
     var debugElem=document.getElementById(DEBUG_ID);
@@ -587,7 +587,7 @@ function run() {
     }
     debugElem.appendChild(document.createTextNode(str+' '));
   }
-  
+
   function createHiddenElem(tag, id) {
     var elem=document.createElement(tag);
     elem.setAttribute('id', id);
@@ -595,8 +595,8 @@ function run() {
     document.body.appendChild(elem);
     return elem;
   }
-  
-  function fixTranslations(language, textDirection) {  
+
+  function fixTranslations(language, textDirection) {
     if (/^af|bg|bn|ca|cs|de|el|es|et|eu|fa|fi|fil|fr|gl|hi|hr|hu|id|it|iw|kn|lv|lt|ml|mr|ms|nl|pl|ro|ru|sl|sk|sr|sw|ta|te|th|uk|ur|vi|zu$/.test(language)) { // fix international UI
       var likeButton=document.getElementById('watch-like');
       if (likeButton) {
@@ -612,24 +612,24 @@ function run() {
       injectStyle('#watch7-secondary-actions .yt-uix-button{margin-'+textDirection+':'+marginPixels+'px!important}');
     }
   }
-  
+
   function findMatch(text, regexp) {
     var matches=text.match(regexp);
     return (matches)?matches[1]:null;
   }
-  
+
   function isString(s) {
     return (typeof s==='string' || s instanceof String);
   }
-    
+
   function isInteger(n) {
     return (typeof n==='number' && n%1==0);
   }
-  
+
   function getPref(name) { // cross-browser GM_getValue
     var a='', b='';
-    try {a=typeof GM_getValue.toString; b=GM_getValue.toString()} catch(e){}    
-    if (typeof GM_getValue === 'function' && 
+    try {a=typeof GM_getValue.toString; b=GM_getValue.toString()} catch(e){}
+    if (typeof GM_getValue === 'function' &&
     (a === 'undefined' || b.indexOf('not supported') === -1)) {
       return GM_getValue(name, null); // Greasemonkey, Tampermonkey, Firefox extension
     } else {
@@ -641,11 +641,11 @@ function run() {
     }
     return;
   }
-  
+
   function setPref(name, value) { //  cross-browser GM_setValue
     var a='', b='';
-    try {a=typeof GM_setValue.toString; b=GM_setValue.toString()} catch(e){}    
-    if (typeof GM_setValue === 'function' && 
+    try {a=typeof GM_setValue.toString; b=GM_setValue.toString()} catch(e){}
+    if (typeof GM_setValue === 'function' &&
     (a === 'undefined' || b.indexOf('not supported') === -1)) {
       GM_setValue(name, value); // Greasemonkey, Tampermonkey, Firefox extension
     } else {
@@ -656,11 +656,11 @@ function run() {
         }
     }
   }
-  
+
   function crossXmlHttpRequest(details) { // cross-browser GM_xmlhttpRequest
     if (typeof GM_xmlhttpRequest === 'function') { // Greasemonkey, Tampermonkey, Firefox extension, Chrome script
       GM_xmlhttpRequest(details);
-    } else if (typeof window.opera !== 'undefined' && window.opera && typeof opera.extension !== 'undefined' && 
+    } else if (typeof window.opera !== 'undefined' && window.opera && typeof opera.extension !== 'undefined' &&
                typeof opera.extension.postMessage !== 'undefined') { // Opera 12 extension
         var index=operaTable.length;
         opera.extension.postMessage({'action':'xhr-'+index, 'url':details.url, 'method':details.method});
@@ -678,9 +678,9 @@ function run() {
         xhr.send();
     }
   }
-   
+
   function addFileSize(url, format) {
-  
+
     function updateVideoLabel(size, format) {
       var elem=document.getElementById(LISTITEM_ID+format);
       if (elem) {
@@ -699,7 +699,7 @@ function run() {
         }
       }
     }
-        
+
     var matchSize=findMatch(url, /[&\?]clen=([0-9]+)&/i);
     if (matchSize) {
       updateVideoLabel(matchSize, format);
@@ -729,35 +729,35 @@ function run() {
       } catch(e) { }
     }
   }
-  
+
   function findSignatureCode(sourceCode) {
     debug('DYVAM - Info: signature start '+getPref(STORAGE_CODE));
-    var signatureFunctionName = 
-    findMatch(sourceCode, 
+    var signatureFunctionName =
+    findMatch(sourceCode,
     /\.set\s*\("signature"\s*,\s*([a-zA-Z0-9_$][\w$]*)\(/)
-    || findMatch(sourceCode, 
+    || findMatch(sourceCode,
     /\.sig\s*\|\|\s*([a-zA-Z0-9_$][\w$]*)\(/)
-    || findMatch(sourceCode, 
+    || findMatch(sourceCode,
     /\.signature\s*=\s*([a-zA-Z_$][\w$]*)\([a-zA-Z_$][\w$]*\)/); //old
     if (signatureFunctionName == null) return setPref(STORAGE_CODE, 'error');
-    signatureFunctionName=signatureFunctionName.replace('$','\\$');    
+    signatureFunctionName=signatureFunctionName.replace('$','\\$');
     var regCode = new RegExp(signatureFunctionName + '\\s*=\\s*function' +
     '\\s*\\([\\w$]*\\)\\s*{[\\w$]*=[\\w$]*\\.split\\(""\\);\n*(.+);return [\\w$]*\\.join');
     var regCode2 = new RegExp('function \\s*' + signatureFunctionName +
-    '\\s*\\([\\w$]*\\)\\s*{[\\w$]*=[\\w$]*\\.split\\(""\\);\n*(.+);return [\\w$]*\\.join');    
+    '\\s*\\([\\w$]*\\)\\s*{[\\w$]*=[\\w$]*\\.split\\(""\\);\n*(.+);return [\\w$]*\\.join');
     var functionCode = findMatch(sourceCode, regCode) || findMatch(sourceCode, regCode2);
-    debug('DYVAM - Info: signaturefunction ' + signatureFunctionName + ' -- ' + functionCode);            
+    debug('DYVAM - Info: signaturefunction ' + signatureFunctionName + ' -- ' + functionCode);
     if (functionCode == null) return setPref(STORAGE_CODE, 'error');
-    
-    var reverseFunctionName = findMatch(sourceCode, 
+
+    var reverseFunctionName = findMatch(sourceCode,
     /([\w$]*)\s*:\s*function\s*\(\s*[\w$]*\s*\)\s*{\s*(?:return\s*)?[\w$]*\.reverse\s*\(\s*\)\s*}/);
     debug('DYVAM - Info: reversefunction ' + reverseFunctionName);
-    if (reverseFunctionName) reverseFunctionName=reverseFunctionName.replace('$','\\$');        
-    var sliceFunctionName = findMatch(sourceCode, 
+    if (reverseFunctionName) reverseFunctionName=reverseFunctionName.replace('$','\\$');
+    var sliceFunctionName = findMatch(sourceCode,
     /([\w$]*)\s*:\s*function\s*\(\s*[\w$]*\s*,\s*[\w$]*\s*\)\s*{\s*(?:return\s*)?[\w$]*\.(?:slice|splice)\(.+\)\s*}/);
     debug('DYVAM - Info: slicefunction ' + sliceFunctionName);
-    if (sliceFunctionName) sliceFunctionName=sliceFunctionName.replace('$','\\$');    
-    
+    if (sliceFunctionName) sliceFunctionName=sliceFunctionName.replace('$','\\$');
+
     var regSlice = new RegExp('\\.(?:'+'slice'+(sliceFunctionName?'|'+sliceFunctionName:'')+
     ')\\s*\\(\\s*(?:[a-zA-Z_$][\\w$]*\\s*,)?\\s*([0-9]+)\\s*\\)'); // .slice(5) sau .Hf(a,5)
     var regReverse = new RegExp('\\.(?:'+'reverse'+(reverseFunctionName?'|'+reverseFunctionName:'')+
@@ -775,7 +775,7 @@ function run() {
         debug(i+': '+codeLine+' --'+(arrSlice?' slice length '+arrSlice.length:'') +' '+(arrReverse?'reverse':''));
         if (arrSlice && arrSlice.length >= 2) { // slice
         var slice=parseInt(arrSlice[1], 10);
-        if (isInteger(slice)){ 
+        if (isInteger(slice)){
           decodeArray.push(-slice);
         } else return setPref(STORAGE_CODE, 'error');
       } else if (arrReverse && arrReverse.length >= 1) { // reverse
@@ -790,7 +790,7 @@ function run() {
             i+=2;
           } else return setPref(STORAGE_CODE, 'error');
       } else if (codeLine.indexOf(',') >= 0) { // swap
-        var swap=findMatch(codeLine, regSwap);      
+        var swap=findMatch(codeLine, regSwap);
         swap=parseInt(swap, 10);
         if (isInteger(swap) && swap>0){
           decodeArray.push(swap);
@@ -798,14 +798,14 @@ function run() {
       } else return setPref(STORAGE_CODE, 'error');
       }
     }
-    
+
     if (decodeArray) {
       setPref(STORAGE_URL, scriptURL);
       setPref(STORAGE_CODE, decodeArray.toString());
       DECODE_RULE=decodeArray;
       debug('DYVAM - Info: signature '+decodeArray.toString()+' '+scriptURL);
       // update download links and add file sizes
-      for (var i=0;i<downloadCodeList.length;i++) {        
+      for (var i=0;i<downloadCodeList.length;i++) {
         var elem=document.getElementById(LISTITEM_ID+downloadCodeList[i].format);
         var url=downloadCodeList[i].url;
         var sig=downloadCodeList[i].sig;
@@ -817,7 +817,7 @@ function run() {
       }
     }
   }
-  
+
   function isValidSignatureCode(arr) { // valid values: '5,-3,0,2,5', 'error'
     if (!arr) return false;
     if (arr=='error') return true;
@@ -827,7 +827,7 @@ function run() {
     }
     return true;
   }
-  
+
   function fetchSignatureScript(scriptURL) {
     var storageURL=getPref(STORAGE_URL);
     var storageCode=getPref(STORAGE_CODE);
@@ -836,7 +836,7 @@ function run() {
         scriptURL.replace(/^https?/i,'')==storageURL.replace(/^https?/i,'')) return;
     try {
       debug('DYVAM fetch '+scriptURL);
-      isSignatureUpdatingStarted=true;    
+      isSignatureUpdatingStarted=true;
       crossXmlHttpRequest({
         method:'GET',
         url:scriptURL,
@@ -845,13 +845,13 @@ function run() {
           if (response.readyState === 4 && response.status === 200 && response.responseText) {
             findSignatureCode(response.responseText);
           }
-        } 
+        }
       });
     } catch(e) { }
   }
-  
+
   function getDecodeRules(rules) {
-    var storageCode=getPref(STORAGE_CODE);    
+    var storageCode=getPref(STORAGE_CODE);
     if (storageCode && storageCode!='error' && isValidSignatureCode(storageCode)) {
       var arr=storageCode.split(',');
       for (var i=0; i<arr.length; i++) {
@@ -862,7 +862,7 @@ function run() {
     }
     return rules;
   }
-  
+
   function decryptSignature(sig) {
     function swap(a,b){var c=a[0];a[0]=a[b%a.length];a[b]=c;return a};
     function decode(sig, arr) { // encoded decryption
@@ -876,8 +876,8 @@ function run() {
       var result=sigA.join('');
       return result;
     }
-    
-    if (sig==null) return '';    
+
+    if (sig==null) return '';
     var arr=DECODE_RULE;
     if (arr) {
       var sig2=decode(sig, arr);
@@ -886,9 +886,9 @@ function run() {
       setPref(STORAGE_URL, '');
       setPref(STORAGE_CODE, '');
     }
-    return sig; 
-  }  
-      
+    return sig;
   }
- 
+
+  }
+
 })();
