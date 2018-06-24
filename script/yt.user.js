@@ -578,7 +578,7 @@ function run() {
   }    
   
   function debug(str) {
-    console.log("[debug]", str);
+    //console.log("[debug]", str);
     var debugElem=document.getElementById(DEBUG_ID);
     if (!debugElem) {
       debugElem=createHiddenElem('div', DEBUG_ID);
