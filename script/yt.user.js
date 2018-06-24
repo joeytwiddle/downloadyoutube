@@ -3,7 +3,9 @@
 // @description Adds a button that lets you download YouTube videos.
 // @homepageURL https://github.com/gantt/downloadyoutube
 // @author Gantt
-// @version 1.8.8
+// @contributor nanojin
+// @contributor joeytwiddle
+// @version 1.8.8.1-joey
 // @date 2016-09-02
 // @namespace http://googlesystem.blogspot.com
 // @include http://www.youtube.com/*
